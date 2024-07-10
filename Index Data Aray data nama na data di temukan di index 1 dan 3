@@ -1,0 +1,54 @@
+#include <iostream>
+#include <iomanip>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+// Fungsi untuk menampilkan array
+void displayArray(const vector<string>& data) {
+    cout << "Isi Data Array:" << endl;
+    cout << setw(8) << left << "Index : ";
+    for (size_t i = 0; i < data.size(); ++i) {
+        cout << setw(10) << left << i;
+    }
+    cout << endl;
+    cout << setw(8) << left << "Data  : ";
+    for (size_t i = 0; i < data.size(); ++i) {
+        cout << setw(10) << left << data[i];
+    }
+    cout << endl;
+}
+
+// Fungsi untuk mencari data dengan huruf ketiga dan keempat adalah "na"
+void searchAndDisplay(const vector<string>& data) {
+    cout << "Data yang dicari Huruf ke 3 dan 4 adalah : na" << endl;
+    vector<int> foundIndexes;
+
+    for (size_t i = 0; i < data.size(); ++i) {
+        if (data[i].length() >= 4 && data[i].substr(2, 2) == "na") {
+            cout << data[i] << "\t";
+            foundIndexes.push_back(i);
+        }
+    }
+    cout << endl;
+
+    cout << "Data 'na' ditemukan pada index ke ";
+    for (size_t i = 0; i < foundIndexes.size(); ++i) {
+        if (i > 0) cout << ", ";
+        cout << foundIndexes[i];
+    }
+    cout << endl;
+}
+
+int main() {
+    vector<string> data = {
+        "Zainab", "Yunarso", "Jojon", "Tinatun", "Qinanti",
+        "Mintarso", "Janah", "Jonathan", "Junaidi"
+    };
+
+    displayArray(data);
+    searchAndDisplay(data);
+
+    return 0;
+}
