@@ -1,1 +1,113 @@
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <vector> // Untuk menggunakan vector sebagai alternatif array dinamis
 
+using namespace std;
+
+// Deklarasi struktur data
+struct Mahasiswa {
+    string nama;
+    string nim;
+    float nilaiTugas1;
+    float nilaiTugas2;
+    float rataRataTugas;
+    char nilaiHuruf;
+};
+
+// Fungsi untuk menghitung nilai huruf berdasarkan rata-rata tugas
+char hitungNilaiHuruf(float rataRata) {
+    if (rataRata >= 83)
+        return 'A';
+    else if (rataRata >= 73)
+        return 'B';
+    else if (rataRata >= 60)
+        return 'C';
+    else if (rataRata >= 50)
+        return 'D';
+    else
+        return 'E';
+}
+
+int main() {
+    
+    cout << "===================================================\n";
+    cout << "|          Selamat datang di kelompok 16          |\n";
+    cout << "===================================================\n";
+    // Meminta input jumlah mahasiswa
+    int jumlahMahasiswa;
+    cout << "Masukkan jumlah mahasiswa: ";
+    cin >> jumlahMahasiswa;
+
+    // Mendefinisikan vector dari struktur Mahasiswa
+    vector<Mahasiswa> dataMahasiswa(jumlahMahasiswa);
+
+    // Mengisi data mahasiswa
+    for (int i = 0; i < jumlahMahasiswa; ++i) {
+        cout << "\nMasukkan data untuk Mahasiswa ke-" << i + 1 << ":\n";
+        cout << "Nama: ";
+        cin.ignore();
+        getline(cin, dataMahasiswa[i].nama);
+        cout << "NIM: ";
+        cin >> dataMahasiswa[i].nim;
+        cout << "Nilai Tugas 1: ";
+        cin >> dataMahasiswa[i].nilaiTugas1;
+        cout << "Nilai Tugas 2: ";
+        cin >> dataMahasiswa[i].nilaiTugas2;
+
+        // Menghitung rata-rata tugas
+        dataMahasiswa[i].rataRataTugas = (dataMahasiswa[i].nilaiTugas1 + dataMahasiswa[i].nilaiTugas2) / 2;
+
+        // Menghitung nilai huruf
+        dataMahasiswa[i].nilaiHuruf = hitungNilaiHuruf(dataMahasiswa[i].rataRataTugas);
+    }
+
+    // Salin data mahasiswa sebelum sorting
+    vector<Mahasiswa> dataMahasiswaSebelumSorting = dataMahasiswa;
+
+    // Bubble Sort untuk mengurutkan dataMahasiswa berdasarkan nama
+    for (int i = 0; i < jumlahMahasiswa - 1; ++i) {
+        for (int j = 0; j < jumlahMahasiswa - i - 1; ++j) {
+            if (dataMahasiswa[j].nama > dataMahasiswa[j + 1].nama) {
+                // Tukar data jika nama lebih besar
+                Mahasiswa temp = dataMahasiswa[j];
+                dataMahasiswa[j] = dataMahasiswa[j + 1];
+                dataMahasiswa[j + 1] = temp;
+            }
+        }
+    }
+
+    // Menampilkan data sebelum pengurutan (tabel pertama)
+    cout << "\nData Mahasiswa Sebelum Sorting:\n";
+    cout << "=====================================================================================\n";
+    cout << "No\tNama\t\tNIM\t\tNilaiTugas 1\tNilaiTugas 2\tRata-RataTugas\tNilaiHuruf\n";
+    cout << "=====================================================================================\n";
+    for (int i = 0; i < jumlahMahasiswa; ++i) {
+        cout << i + 1 << "\t"
+             << setw(10) << left << dataMahasiswaSebelumSorting[i].nama
+             << setw(15) << left << dataMahasiswaSebelumSorting[i].nim
+             << setw(15) << left << dataMahasiswaSebelumSorting[i].nilaiTugas1
+             << setw(19) << left << dataMahasiswaSebelumSorting[i].nilaiTugas2
+             << setw(15) << left << dataMahasiswaSebelumSorting[i].rataRataTugas
+             << setw(15) << left << dataMahasiswaSebelumSorting[i].nilaiHuruf << "\n";
+    }
+    cout << "=====================================================================================\n";
+
+    // Menampilkan data setelah pengurutan (tabel kedua)
+    cout << "\nData Mahasiswa Setelah Sorting:\n";
+    cout << "=====================================================================================\n";
+    cout << "No\tNama\t\tNIM\t\tNilaiTugas 1\tNilaiTugas 2\tRata-RataTugas\tNilaiHuruf\n";
+    cout << "=====================================================================================\n";
+    for (int i = 0; i < jumlahMahasiswa; ++i) {
+        cout << i + 1 << "\t"
+             << setw(10) << left << dataMahasiswa[i].nama
+             << setw(13) << left << dataMahasiswa[i].nim
+             << setw(17) << left << dataMahasiswa[i].nilaiTugas1
+             << setw(17) << left << dataMahasiswa[i].nilaiTugas2
+             << setw(15) << left << dataMahasiswa[i].rataRataTugas
+             << setw(15) << left << dataMahasiswa[i].nilaiHuruf << "\n";
+    }
+    cout << "=====================================================================================\n";
+
+    return 0;
+}
