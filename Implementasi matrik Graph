@@ -1,0 +1,148 @@
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <limits>
+#include <queue>
+#include <deque>
+
+class Graph {
+public:
+    void addNode(const std::string& node) {
+        nodes.push_back(node);
+        adjacencyList[node] = {};
+    }
+
+    void addEdge(const std::string& from, const std::string& to, int weight) {
+        adjacencyList[from].push_back({to, weight});
+    }
+
+    std::unordered_map<std::string, int> dijkstra(const std::string& startNode) {
+        std::unordered_map<std::string, int> distances;
+        for (const auto& node : nodes) {
+            distances[node] = std::numeric_limits<int>::max();
+        }
+        distances[startNode] = 0;
+
+        auto compare = [&distances](const std::string& lhs, const std::string& rhs) {
+            return distances[lhs] > distances[rhs];
+        };
+        std::priority_queue<std::string, std::vector<std::string>, decltype(compare)> pq(compare);
+        pq.push(startNode);
+
+        while (!pq.empty()) {
+            std::string currentNode = pq.top();
+            pq.pop();
+
+            for (const auto& neighbor : adjacencyList[currentNode]) {
+                const std::string& neighborNode = neighbor.first;
+                int weight = neighbor.second;
+
+                if (distances[currentNode] + weight < distances[neighborNode]) {
+                    distances[neighborNode] = distances[currentNode] + weight;
+                    pq.push(neighborNode);
+                }
+            }
+        }
+        return distances;
+    }
+
+    std::vector<std::string> shortestPath(const std::string& startNode, const std::string& endNode) {
+        std::unordered_map<std::string, std::string> previous;
+        std::unordered_map<std::string, int> distances = dijkstra(startNode);
+
+        std::deque<std::string> path;
+        std::string currentNode = endNode;
+
+        while (currentNode != startNode && !distances.empty()) {
+            for (const auto& node : nodes) {
+                if (distances[node] == distances[currentNode] - adjacencyList[node][0].second) {
+                    path.push_front(currentNode);
+                    currentNode = node;
+                    break;
+                }
+            }
+        }
+        path.push_front(startNode);
+
+        return {path.begin(), path.end()};
+    }
+
+    std::pair<std::vector<std::string>, int> optimalPath() {
+        // Placeholder for the optimal path. Implement your own logic here.
+        return {{"A", "B", "C"}, 10};
+    }
+
+private:
+    std::vector<std::string> nodes;
+    std::unordered_map<std::string, std::vector<std::pair<std::string, int>>> adjacencyList;
+};
+
+void displayMenu() {
+    std::cout << "\n     Menu pada Graph\n";
+    std::cout << "    -----------------\n";
+    std::cout << "1. Inputkan Node, Edge of GRAPH\n";
+    std::cout << "2. Tampilkan jalur optimal pengerjaan proyek Graf\n";
+    std::cout << "3. Tampilkan jalur terpendik\n";
+    std::cout << "4. Exit\n";
+    std::cout << "Masukan No. Pilihan 1-4 : ";
+}
+
+int main() {
+    Graph graph;
+
+    int choice;
+    while (true) {
+        displayMenu();
+        std::cin >> choice;
+
+        if (choice == 1) {
+            std::string node;
+            std::cout << "Masukkan Node (A-C): ";
+            std::cin >> node;
+            graph.addNode(node);
+
+            std::string fromNode, toNode;
+            int weight;
+            std::cout << "Masukkan Node asal: ";
+            std::cin >> fromNode;
+            std::cout << "Masukkan Node tujuan: ";
+            std::cin >> toNode;
+            std::cout << "Masukkan jarak: ";
+            std::cin >> weight;
+            graph.addEdge(fromNode, toNode, weight);
+
+        } else if (choice == 2) {
+            auto [path, duration] = graph.optimalPath();
+            std::cout << "Jalur optimal pengerjaan proyek graf: ";
+            for (size_t i = 0; i < path.size(); ++i) {
+                std::cout << path[i];
+                if (i < path.size() - 1) std::cout << "→";
+            }
+            std::cout << " = " << duration << " [bulan]\n";
+
+        } else if (choice == 3) {
+            std::string startNode, endNode;
+            std::cout << "Masukkan titik awal: ";
+            std::cin >> startNode;
+            std::cout << "Masukkan titik tujuan: ";
+            std::cin >> endNode;
+
+            auto path = graph.shortestPath(startNode, endNode);
+            std::cout << "Jalur terpendek dari titik " << startNode << " ke titik " << endNode << " :\n";
+            for (size_t i = 0; i < path.size(); ++i) {
+                std::cout << path[i];
+                if (i < path.size() - 1) std::cout << "→";
+            }
+            std::cout << "\n";
+
+        } else if (choice == 4) {
+            std::cout << "Terima kasih!\n";
+            break;
+
+        } else {
+            std::cout << "Pilihan tidak valid. Silakan coba lagi.\n";
+        }
+    }
+
+    return 0;
+}
