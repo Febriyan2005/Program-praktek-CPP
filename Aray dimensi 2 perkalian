@@ -1,0 +1,57 @@
+#include <iostream>
+#include <iomanip> // Untuk setprecision
+using namespace std;
+
+int main() {
+    int i, j;
+    int max_rows, max_cols;
+    
+    cout << "===================================================\n";
+    cout << "|          Selamat datang di kelompok 16          |\n";
+    cout << "===================================================\n";
+    
+    cout << "Masukkan jumlah baris untuk matriks: ";
+    cin >> max_rows;
+    cout << "Masukkan jumlah kolom untuk matriks: ";
+    cin >> max_cols;
+    
+    int matrik_A[max_rows][max_cols];
+    int matrik_B[max_rows][max_cols];
+    int matrik_C[max_rows][max_cols];
+
+    cout << "\nInputkan elemen-elemen matriks A:\n";
+    for (i = 0; i < max_rows; i++) {
+        for (j = 0; j < max_cols; j++) {
+            cout << "Masukkan nilai untuk A[" << i << "][" << j << "]: ";
+            cin >> matrik_A[i][j];
+        }
+    }
+
+    cout << "\nInputkan elemen-elemen matriks B:\n";
+    for (i = 0; i < max_rows; i++) {
+        for (j = 0; j < max_cols; j++) {
+            cout << "Masukkan nilai untuk B[" << i << "][" << j << "]: ";
+            cin >> matrik_B[i][j];
+        }
+    }
+
+    cout << "\n\tMATRIK_A\tx\tMATRIK_B\t=\tMATRIK_C" << endl;
+
+    for (i = 0; i < max_rows; i++) {
+        for (j = 0; j < max_cols; j++) {
+            cout << setw(4) << matrik_A[i][j] << " ";
+        }
+        cout << "\t\t\t";
+        for (j = 0; j < max_cols; j++) {
+            cout << setw(4) << matrik_B[i][j] << " ";
+        }
+        cout << "\t\t\t";
+        for (j = 0; j < max_cols; j++) {
+            matrik_C[i][j] = matrik_A[i][j] * matrik_B[i][j];
+            cout << setw(4) << matrik_C[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
