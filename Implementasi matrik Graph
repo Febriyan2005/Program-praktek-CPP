@@ -1,146 +1,178 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
-#include <limits>
 #include <queue>
-#include <deque>
+#include <climits>
+#include <stack>
 
-class Graph {
-public:
-    void addNode(const std::string& node) {
-        nodes.push_back(node);
-        adjacencyList[node] = {};
-    }
+using namespace std;
 
-    void addEdge(const std::string& from, const std::string& to, int weight) {
-        adjacencyList[from].push_back({to, weight});
-    }
-
-    std::unordered_map<std::string, int> dijkstra(const std::string& startNode) {
-        std::unordered_map<std::string, int> distances;
-        for (const auto& node : nodes) {
-            distances[node] = std::numeric_limits<int>::max();
-        }
-        distances[startNode] = 0;
-
-        auto compare = [&distances](const std::string& lhs, const std::string& rhs) {
-            return distances[lhs] > distances[rhs];
-        };
-        std::priority_queue<std::string, std::vector<std::string>, decltype(compare)> pq(compare);
-        pq.push(startNode);
-
-        while (!pq.empty()) {
-            std::string currentNode = pq.top();
-            pq.pop();
-
-            for (const auto& neighbor : adjacencyList[currentNode]) {
-                const std::string& neighborNode = neighbor.first;
-                int weight = neighbor.second;
-
-                if (distances[currentNode] + weight < distances[neighborNode]) {
-                    distances[neighborNode] = distances[currentNode] + weight;
-                    pq.push(neighborNode);
-                }
-            }
-        }
-        return distances;
-    }
-
-    std::vector<std::string> shortestPath(const std::string& startNode, const std::string& endNode) {
-        std::unordered_map<std::string, std::string> previous;
-        std::unordered_map<std::string, int> distances = dijkstra(startNode);
-
-        std::deque<std::string> path;
-        std::string currentNode = endNode;
-
-        while (currentNode != startNode && !distances.empty()) {
-            for (const auto& node : nodes) {
-                if (distances[node] == distances[currentNode] - adjacencyList[node][0].second) {
-                    path.push_front(currentNode);
-                    currentNode = node;
-                    break;
-                }
-            }
-        }
-        path.push_front(startNode);
-
-        return {path.begin(), path.end()};
-    }
-
-    std::pair<std::vector<std::string>, int> optimalPath() {
-        // Placeholder for the optimal path. Implement your own logic here.
-        return {{"A", "B", "C"}, 10};
-    }
-
-private:
-    std::vector<std::string> nodes;
-    std::unordered_map<std::string, std::vector<std::pair<std::string, int>>> adjacencyList;
+// Define the graph using adjacency list representation
+unordered_map<char, vector<pair<char, int>>> graph = {
+    {'A', {{'B', 7}, {'C', 6}, {'D', 5}, {'E', 9}}},
+    {'B', {{'F', 4}, {'G', 8}, {'H', 11}}},
+    {'C', {{'F', 10}, {'G', 3}}},
+    {'D', {{'G', 9}}},
+    {'E', {{'G', 6}, {'H', 12}}},
+    {'F', {{'I', 12}, {'J', 9}}},
+    {'G', {{'I', 5}, {'J', 7}}},
+    {'H', {{'J', 10}, {'K', 8}}},
+    {'I', {{'L', 7}}},
+    {'J', {{'L', 8}}},
+    {'K', {{'L', 11}}},
+    // Adding additional connections for nodes up to 'Z'
+    {'L', {{'M', 2}, {'N', 3}}},
+    {'M', {{'O', 4}, {'P', 5}}},
+    {'N', {{'Q', 6}, {'R', 7}}},
+    {'O', {{'S', 8}, {'T', 9}}},
+    {'P', {{'U', 10}, {'V', 11}}},
+    {'Q', {{'W', 12}, {'X', 13}}},
+    {'R', {{'Y', 14}, {'Z', 15}}},
+    {'S', {{'T', 1}, {'U', 2}}},
+    {'T', {{'V', 3}, {'W', 4}}},
+    {'U', {{'X', 5}, {'Y', 6}}},
+    {'V', {{'Z', 7}}},
+    {'W', {{'Z', 8}}},
+    {'X', {{'Y', 9}, {'Z', 10}}},
+    {'Y', {{'Z', 11}}},
 };
 
-void displayMenu() {
-    std::cout << "\n     Menu pada Graph\n";
-    std::cout << "    -----------------\n";
-    std::cout << "1. Inputkan Node, Edge of GRAPH\n";
-    std::cout << "2. Tampilkan jalur optimal pengerjaan proyek Graf\n";
-    std::cout << "3. Tampilkan jalur terpendik\n";
-    std::cout << "4. Exit\n";
-    std::cout << "Masukan No. Pilihan 1-4 : ";
+void shortestPath(char start, char end) {
+    unordered_map<char, int> distances;
+    unordered_map<char, char> previous;
+    for (auto &node : graph) {
+        distances[node.first] = INT_MAX;
+    }
+    distances[start] = 0;
+
+    auto cmp = [&distances](char left, char right) { return distances[left] > distances[right]; };
+    priority_queue<char, vector<char>, decltype(cmp)> pq(cmp);
+    pq.push(start);
+
+    while (!pq.empty()) {
+        char current = pq.top();
+        pq.pop();
+
+        if (current == end) break;
+
+        for (auto &neighbor : graph[current]) {
+            char next = neighbor.first;
+            int weight = neighbor.second;
+            int newDist = distances[current] + weight;
+            if (newDist < distances[next]) {
+                distances[next] = newDist;
+                previous[next] = current;
+                pq.push(next);
+            }
+        }
+    }
+
+    if (distances[end] == INT_MAX) {
+        cout << "No path found from " << start << " to " << end << endl;
+        return;
+    }
+
+    cout << "Shortest path from " << start << " to " << end << ": ";
+    stack<char> path;
+    for (char at = end; at != start; at = previous[at]) {
+        path.push(at);
+    }
+    path.push(start);
+
+    while (!path.empty()) {
+        cout << path.top();
+        path.pop();
+        if (!path.empty()) cout << " -> ";
+    }
+    cout << "\nDistance: " << distances[end] << endl;
+}
+
+void longestPathUtil(char node, char end, unordered_map<char, bool> &visited, int currentDist, int &maxDist, vector<char> &currentPath, vector<char> &longestPath) {
+    visited[node] = true;
+    currentPath.push_back(node);
+
+    if (node == end) {
+        if (currentDist > maxDist) {
+            maxDist = currentDist;
+            longestPath = currentPath;
+        }
+    } else {
+        for (auto &neighbor : graph[node]) {
+            if (!visited[neighbor.first]) {
+                longestPathUtil(neighbor.first, end, visited, currentDist + neighbor.second, maxDist, currentPath, longestPath);
+            }
+        }
+    }
+
+    currentPath.pop_back();
+    visited[node] = false;
+}
+
+void longestPath(char start, char end) {
+    unordered_map<char, bool> visited;
+    for (auto &node : graph) {
+        visited[node.first] = false;
+    }
+
+    int maxDist = INT_MIN;
+    vector<char> currentPath;
+    vector<char> longestPath;
+
+    longestPathUtil(start, end, visited, 0, maxDist, currentPath, longestPath);
+
+    if (maxDist == INT_MIN) {
+        cout << "No path found from " << start << " to " << end << endl;
+        return;
+    }
+
+    cout << "Longest path from " << start << " to " << end << ": ";
+    for (char node : longestPath) {
+        cout << node;
+        if (node != end) cout << " -> ";
+    }
+    cout << "\nDistance: " << maxDist << endl;
 }
 
 int main() {
-    Graph graph;
-
     int choice;
+    char startNode = '\0', endNode = '\0';
+
     while (true) {
-        displayMenu();
-        std::cin >> choice;
+        cout << "Menu:\n";
+        cout << "1. Input nodes\n";
+        cout << "2. Find the shortest path\n";
+        cout << "3. Find the longest path\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
 
-        if (choice == 1) {
-            std::string node;
-            std::cout << "Masukkan Node (A-C): ";
-            std::cin >> node;
-            graph.addNode(node);
-
-            std::string fromNode, toNode;
-            int weight;
-            std::cout << "Masukkan Node asal: ";
-            std::cin >> fromNode;
-            std::cout << "Masukkan Node tujuan: ";
-            std::cin >> toNode;
-            std::cout << "Masukkan jarak: ";
-            std::cin >> weight;
-            graph.addEdge(fromNode, toNode, weight);
-
-        } else if (choice == 2) {
-            auto [path, duration] = graph.optimalPath();
-            std::cout << "Jalur optimal pengerjaan proyek graf: ";
-            for (size_t i = 0; i < path.size(); ++i) {
-                std::cout << path[i];
-                if (i < path.size() - 1) std::cout << "→";
-            }
-            std::cout << " = " << duration << " [bulan]\n";
-
-        } else if (choice == 3) {
-            std::string startNode, endNode;
-            std::cout << "Masukkan titik awal: ";
-            std::cin >> startNode;
-            std::cout << "Masukkan titik tujuan: ";
-            std::cin >> endNode;
-
-            auto path = graph.shortestPath(startNode, endNode);
-            std::cout << "Jalur terpendek dari titik " << startNode << " ke titik " << endNode << " :\n";
-            for (size_t i = 0; i < path.size(); ++i) {
-                std::cout << path[i];
-                if (i < path.size() - 1) std::cout << "→";
-            }
-            std::cout << "\n";
-
-        } else if (choice == 4) {
-            std::cout << "Terima kasih!\n";
-            break;
-
-        } else {
-            std::cout << "Pilihan tidak valid. Silakan coba lagi.\n";
+        switch (choice) {
+            case 1:
+                cout << "Enter start node: ";
+                cin >> startNode;
+                cout << "Enter end node: ";
+                cin >> endNode;
+                break;
+            case 2:
+                if (startNode != '\0' && endNode != '\0') {
+                    cout << "Finding shortest path from " << startNode << " to " << endNode << "...\n";
+                    shortestPath(startNode, endNode);
+                } else {
+                    cout << "Please input nodes first.\n";
+                }
+                break;
+            case 3:
+                if (startNode != '\0' && endNode != '\0') {
+                    cout << "Finding longest path from " << startNode << " to " << endNode << "...\n";
+                    longestPath(startNode, endNode);
+                } else {
+                    cout << "Please input nodes first.\n";
+                }
+                break;
+            case 4:
+                return 0;
+            default:
+                cout << "Invalid choice! Please try again.\n";
         }
     }
 
